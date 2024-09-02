@@ -1,0 +1,19 @@
+﻿@model GenreModel
+@{
+    ViewData["Title"] = "Создание жанра";
+}
+
+<div class="text-danger" asp-validation-summary="All"></div>
+
+<form method="post" asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Name">Название</label>
+        <div>
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <input class="form-control" asp-for="Name" />
+    </div>
+    <button class="btn btn-primary mt-2" type="submit">Создать</button>
+    <a class="btn btn-secondary mt-2" asp-action="List">Назад</a>
+</form>
+

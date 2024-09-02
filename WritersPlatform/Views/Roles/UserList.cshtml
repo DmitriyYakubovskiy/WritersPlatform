@@ -1,0 +1,18 @@
+﻿@model WritersPlatform.DataAccess.Entities.AppUser[]
+@{
+    ViewData["Title"] = "Пользователи";
+}
+
+<h2>Список пользователей</h2>
+<table class="table">
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Email</td>
+            <td>
+                <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-userid="@user.Id">Права доступа</a>
+            </td>
+        </tr>
+    }
+</table>
+<a class="btn btn-secondary mt-2" asp-action="List">Назад</a>

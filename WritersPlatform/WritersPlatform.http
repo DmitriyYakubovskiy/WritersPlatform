@@ -1,0 +1,6 @@
+@WritersPlatform_HostAddress = http://localhost:5232
+
+GET {{WritersPlatform_HostAddress}}/
+Accept: application/json
+
+###

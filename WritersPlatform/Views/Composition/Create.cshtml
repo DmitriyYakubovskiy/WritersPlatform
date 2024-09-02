@@ -1,0 +1,38 @@
+﻿@model CreateCompositionViewModel
+@{
+    ViewData["Title"] = "Создание произведения";
+}
+
+<div class="text-danger" asp-validation-summary="All"></div>
+
+<form enctype="multipart/form-data" method="post" asp-action="Create">
+    <div class="form-group">
+        <label for="Name">Название</label>
+        <input class="form-control" type="text" id="Name" name="Name" required />
+    </div>
+    <div class="form-group">
+        <label for="Author">Автор</label>
+        <input class="form-control" type="hidden" id="AuthorId" name="AuthorId" value="@Model.Composition.Author.Id" readonly />
+         <input class="form-control" value="@Model.Composition.Author.Email" readonly />
+    </div>
+    <div>
+        <label for="Description">Описание</label>
+        <textarea class="form-control" id="Description" name="Description" required></textarea>
+    </div class="form-group" >
+    <div class="form-group">
+        <label for="Genre">Жанр</label>
+        <select required id="Genre" name="GenreId" class="form-control" asp-items="@(new SelectList(Model?.Genres, "Id", "Name"))">
+            <option value="" disabled selected>Выберите жанр</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="Path">Содержание</label>
+        <input type="file" id="file" name="file" accept="application/pdf" required />
+    </div>
+    <div class="form-group">
+        <label for="ImagePath">Обложка</label>
+        <input type="file" id="Image" name="Image" accept="image/*" required />
+    </div>
+    <button class="btn btn-primary mt-2" type="submit">Создать</button>
+    <a class="btn btn-secondary mt-2" asp-action="List">Назад</a>
+</form>

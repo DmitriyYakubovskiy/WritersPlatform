@@ -1,0 +1,139 @@
+﻿@model (CompositionModel[],GenreModel[], AuthorModel[], SortCompositionModel, string)
+@{
+    ViewData["Title"] = "Произведения";
+}
+
+<a asp-action="Create" class="btn btn-primary w-20 mb-3">Создать произведение</a>
+@if (User.IsInRole("admin"))
+{
+    <a asp-controller="Genre" asp-action="Create" class="btn btn-primary w-5 mb-3">Создать жанр</a>
+}
+
+<div class="container-fluid text-center ">
+    <div class="row align-items-start">
+
+        <div class="col-1 col-sm-2">
+            <h2>Жанры</h2>
+            @{
+                <button class="btn btn-primary w-100 mb-2" onclick="sort('null')">Все жанры</button>
+                foreach (var genre in Model.Item2)
+                {
+                    <button class="btn btn-primary w-100 mb-2" onclick="sort('@genre.Id')"> @genre.Name </button>
+                }
+                <input id="sortByGenre" type="hidden" value="@Model.Item4.GenreId"></input>
+            }
+        </div>
+
+        <div class="col">
+            <div class="container-fluid text-center">
+                <div class="row align-items-start">
+                    @{
+                        foreach (var composition in Model.Item1)
+                        {
+                            <div class="col-lg-6 align-items-stretch">
+                                <div class="card">
+                                    <h5 class="card-header">@composition.Name</h5>
+                                    <img class="card-img-top" src="~/@composition.ImagePath" alt="@composition.Name" />
+                                    <div class="card-body">
+                                        <p class="card-text">Автор: @composition.Author.Email</p>
+                                        <p class="card-text">Рейтинг: @composition.Rating</p>
+                                        <p style="max-width" class="card-text">@composition.Description</p>
+
+                                        <a asp-action="GetById" asp-route-id="@composition.Id" class="btn btn-sm btn-primary">Подробнее</a>
+                                        @if (User.IsInRole("admin"))
+                                        {
+                                            <a id="delete-btn" class="btn btn-sm btn-danger" onclick="confirmDeleteComposition(@composition.Id)">Удалить</a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-1 col-sm-2">
+            <h2>Фильтры</h2>
+            <label>Сортировать по:</label>
+            <div>
+                <select id="sortByDate" class="form-select mb-2 w-100" onchange="filter()">
+                    <option value="">Дата</option>
+                    <option value="true"> Дата: от ранней к поздней</option>
+                    <option value="false">Дата: от поздней к ранней</option>
+                    @{
+                        if (Model.Item4.Earlier!=null)
+                        {
+                            <option value="@Model.Item4.Earlier" selected>@(Model.Item4.Earlier == true ? "Дата: от ранней к поздней" : "Дата: от поздней к ранней");</option>
+                        }
+                    }
+                </select>
+                <select id="sortByRating" class="form-select mb-2 w-100" onchange="filter()">
+                    <option value="">Рейтинг</option>
+                    <option value="true">От большего к меньшему</option>
+                    <option value="false">От меньшего к большему</option>
+                    @{
+                        if (Model.Item4.RatingHigher!=null)
+                        {
+                            <option value="@Model.Item4.RatingHigher" selected>@(Model.Item4.RatingHigher == true ? "От большего к меньшему" : "От меньшего к большему");</option>
+                        }
+                    }
+                </select>
+                <select id="sortByAuthor" class="form-select mb-2 w-100" onchange="filter()" asp-items="@(new SelectList(Model.Item3, "Id", "Email"))">
+                        <option value="" disabled selected>Автор</option>
+                        @{
+                            if (Model.Item4.AuthorId!=null) 
+                            {
+                                <option value="@Model.Item4.AuthorId" selected>@(Model.Item3.FirstOrDefault(a=>a.Id==Model.Item4.AuthorId.Value).Email);</option>
+                            }
+                        }
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        function filter() {
+            const sortValueDate = document.getElementById('sortByDate').value;
+            const sortValueRating = document.getElementById('sortByRating').value;
+            const sortValueAuthor = document.getElementById('sortByAuthor').value;
+            const genreId = document.getElementById('sortByGenre').value;
+
+            window.location.href = '@Url.Action("List", "Composition")?&earlier=' + sortValueDate + '&authorId=' + sortValueAuthor + '&ratingHigher='+sortValueRating + '&genreId=' + genreId;
+        }
+
+        function sort(id) {
+            const sortValueDate = document.getElementById('sortByDate').value;
+            const sortValueRating = document.getElementById('sortByRating').value;
+            const sortValueAuthor = document.getElementById('sortByAuthor').value;
+            const sortValueGenre = id;
+
+            window.location.href = '@Url.Action("List", "Composition")?&earlier=' + sortValueDate + '&authorId=' + sortValueAuthor + '&ratingHigher=' + sortValueRating + '&genreId=' + sortValueGenre;
+        }
+    </script>
+    <script type="text/javascript">
+        document.getElementById("delete-btn").addEventListener("click", deleteComposition);
+
+        async function confirmDeleteComposition(id) {
+            if (confirm('Вы уверены, что хотите удалить произведение?')) {
+                await deleteComposition(id);
+            }
+        }
+
+        async function deleteComposition(id) {
+            try {
+                await fetch(id, {
+                    method: "DELETE",
+                    headers: { "Accept": "application/json", "Content-Type": "application/json" }
+                });
+                window.location.href = '/Composition/List';
+            } catch (error) {
+                console.log(error);
+                alert('Произошла ошибка при удалении');
+            }
+        }
+    </script>
+}
+
+

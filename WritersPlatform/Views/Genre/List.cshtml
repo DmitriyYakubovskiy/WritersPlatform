@@ -1,0 +1,56 @@
+﻿@model GenreModel[]
+@{
+    ViewData["Title"] = "Жанры";
+}
+
+<h2 class="display-2">Жанры</h2>
+@if (User.IsInRole("admin"))
+{
+    <a asp-action="Create" class="btn btn-primary mb-5">Создать</a>
+}
+
+<div class="container-fluid text-center ">
+    <div class="row align-items-start">
+        @{
+            foreach (var genre in Model)
+            {
+                <div class="col-3 align-items-stretch">
+                    <div class="card">
+                        <h2 class="card-header">@genre.Name</h2>
+                        <div class="card-body">
+                            @if (User.IsInRole("admin"))
+                            {
+                                <a asp-action="Edit" asp-route-id="@genre.Id" class="btn btn-sm btn-warning"> Изменить</a>
+                                <a id="delete-btn" class="btn btn-sm btn-danger" onclick="confirmDeleteGenre(@genre.Id)">Удалить</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    document.getElementById("delete-btn").addEventListener("click", deleteGenre);
+
+    async function confirmDeleteGenre(id) {
+        if (confirm('Вы уверены, что хотите удалить жанр?')) {
+            await deleteGenre(id);
+        }
+    }
+
+    async function deleteGenre(id) {
+        try {
+            await fetch(id, {
+                method: "DELETE",
+                headers: { "Accept": "application/json", "Content-Type": "application/json" }
+            });
+            window.location.href = '/Genre/List';
+        } catch (error) {
+            console.log(error);
+            alert('Произошла ошибка при удалении');
+        }
+    }
+</script>

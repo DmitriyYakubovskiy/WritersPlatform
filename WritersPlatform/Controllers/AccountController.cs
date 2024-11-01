@@ -39,7 +39,6 @@ public class AccountController : Controller
     private async Task CreateAdmin()
     {
         var user = await userManager.FindByEmailAsync("admin@dima.ru");
-        Console.WriteLine(user==null);
         if (user == null)
         {
             var admin = new AppUser

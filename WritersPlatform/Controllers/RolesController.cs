@@ -15,7 +15,7 @@ public class RolesController : Controller
     private readonly UserManager<AppUser> userManager;
 
     public RolesController(RoleManager<IdentityRole> roleManager, UserManager<AppUser> userManager)
-    {
+    {;
         this.roleManager = roleManager;
         this.userManager = userManager;
     }

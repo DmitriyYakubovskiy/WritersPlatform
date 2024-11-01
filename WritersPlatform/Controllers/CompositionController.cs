@@ -101,6 +101,10 @@ public class CompositionController : Controller
     [Authorize]
     public async Task<IActionResult> Create([FromForm(Name ="name")] string name, IFormFile image, IFormFile file, [FromForm(Name = "description")] string description, [FromForm(Name ="genreId")]int genreId, [FromForm(Name = "authorId")] int authorId)
     {
+        if (!Directory.Exists("wwwroot/images/")) Directory.CreateDirectory("wwwroot/images/");
+        if (!Directory.Exists("wwwroot/files/")) Directory.CreateDirectory("wwwroot/files/");
+        
+
         var fileName= String.Format(@"{0}.pdf", Guid.NewGuid());
         var imageName= String.Format(@"{0}."+$"{System.IO.Path.GetExtension(image.FileName)}", Guid.NewGuid());
         var filePath="wwwroot/files/"+fileName;

@@ -1,4 +1,5 @@
-﻿using WritersPlatform.DataAccess.Contexts;
+﻿using Microsoft.EntityFrameworkCore;
+using WritersPlatform.DataAccess.Contexts;
 using WritersPlatform.DataAccess.Entities;
 
 namespace WritersPlatform.DataAccess.Repositories;
@@ -34,7 +35,8 @@ public class CommentRepository : ICommentRepository
 
     public CommentEntity[] GetAll()
     {
-        return dbContext.Comments.ToArray();
+        return dbContext.Comments.Include(x => x.Author)
+            .Include(x => x.Composition).ToArray();
     }
 
     public CommentEntity GetById(int id)
@@ -44,7 +46,8 @@ public class CommentRepository : ICommentRepository
 
     public CommentEntity[] GetCommentsFromComposition(int compositionId)
     {
-        return dbContext.Comments.Where(x => x.Composition.Id == compositionId).ToArray();
+        return dbContext.Comments.Where(x => x.Composition.Id == compositionId).Include(x => x.Author)
+            .Include(x => x.Composition).ToArray();
     }
 
     public void Update(CommentEntity entity)

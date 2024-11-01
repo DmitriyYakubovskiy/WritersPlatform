@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Linq;
 using System.Security.Claims;
+using System.Xml.Linq;
 using WritersPlatform.DataAccess.Entities;
 using WritersPlatform.Models;
 
@@ -21,6 +25,42 @@ public class AccountController : Controller
         this.userManager = userManager;
         this.signInManager = signInManager;
         this.roleManager = roleManager;
+        CreateDefaultRoles().Wait();
+        CreateAdmin().Wait();
+    }
+
+    private async Task CreateDefaultRoles()
+    {
+        var roles = roleManager.Roles;
+        if(await roles.FirstOrDefaultAsync(x=>x.Name=="admin") == null) await roleManager.CreateAsync(new IdentityRole("admin"));
+        if (await roles.FirstOrDefaultAsync(x => x.Name == "user") == null)  await roleManager.CreateAsync(new IdentityRole("user"));
+    }
+
+    private async Task CreateAdmin()
+    {
+        var user = await userManager.FindByEmailAsync("admin@dima.ru");
+        Console.WriteLine(user==null);
+        if (user == null)
+        {
+            var admin = new AppUser
+            {
+                UserName = "admin",
+                Email = "admin@dima.ru"
+            };
+
+            var result = await userManager.CreateAsync(admin, "admin");
+            if (result.Succeeded)
+            {
+                await userManager.AddToRolesAsync(admin, new List<string>() { "user", "admin" });
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    Console.WriteLine(error.Description);
+                }
+            }
+        }
     }
 
     [HttpGet("Login")]

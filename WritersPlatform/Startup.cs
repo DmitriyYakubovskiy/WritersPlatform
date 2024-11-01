@@ -32,7 +32,13 @@ public class Startup
                 options.SuppressMapClientErrors = true;
             });
 
-        services.AddIdentity<AppUser, IdentityRole>()
+        services.AddIdentity<AppUser, IdentityRole>(options => {
+            options.Password.RequireDigit = false;
+            options.Password.RequiredLength = 4;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = false;
+        })
             .AddEntityFrameworkStores<UsersDbContext>()
             .AddDefaultTokenProviders();
         services.AddAuthentication()
@@ -67,6 +73,7 @@ public class Startup
         services.AddSwaggerGen();
         services.AddHttpContextAccessor();
         services.AddMvc();
+
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
